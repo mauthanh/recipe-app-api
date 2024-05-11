@@ -8,13 +8,14 @@ COPY ./app /app
 WORKDIR /app
 EXPOSE 8000
 
+ARG DEV=false
 RUN python -m venv /py && \
     /py/bin/pip install --upgrade pip && \
     apk add --update --no-cache postgresql-client && \
     apk add --update --no-cache --virtual .tmp-build-deps \
         build-base postgresql-dev musl-dev && \
     if [ $DEV = "true" ]; \
-      then /py/bin/pip install -r /tmp/requirements.dev.txt ; \
+      then /py/bin/pip install -r /tmp/requirements.txt ; \
     fi && \
     rm -rf /tmp && \
     apk del .tmp-build-deps && \
@@ -23,6 +24,8 @@ RUN python -m venv /py && \
         --no-create-home \
         django-user
 
-ENV PATH="/py/bin:$PATH"
+ENV PATH="/scripts:/py/bin:$PATH"
 
 USER django-user
+
+CMD ["run.sh"]
